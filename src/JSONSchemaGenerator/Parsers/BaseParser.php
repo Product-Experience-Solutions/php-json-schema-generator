@@ -101,7 +101,7 @@ class BaseParser
         }
 
         // namespace is schema_
-        // try to set all the variables for the schema from the supplied config 
+        // try to set all the variables for the schema from the supplied config
         if (isset($this->config['schema_dollarSchema'])) {
             $this->schemaObject->setDollarSchema($this->config['schema_dollarSchema']);
         }
@@ -194,13 +194,15 @@ class BaseParser
         $requiredDefault = $this->config['properties_required_by_default'];
 
         $type = StringMapper::map($property);
+        $example = $this->getPropertyExample($property, $type);
 
         $prop = new Definition();
         $prop->setType($type)
              ->setCollectionMode($this->config['items_schema_collect_mode']
                                ? Definition::ITEMS_AS_LIST
                                : Definition::ITEMS_AS_COLLECTION)
-            ->setRequired($requiredDefault);
+            ->setRequired($requiredDefault)
+            ->setExample($example);
 
         if ($type === StringMapper::STRING_TYPE) {
             $prop->setFormat(StringMapper::guessStringFormat($property));
@@ -225,6 +227,17 @@ class BaseParser
         }
 
         return $prop;
+    }
+
+    protected function getPropertyExample($property, string $type): string {
+        $supportExamples = [
+            StringMapper::STRING_TYPE,
+            StringMapper::NUMBER_TYPE,
+            StringMapper::INTEGER_TYPE,
+            StringMapper::BOOLEAN_TYPE,
+        ];
+
+        return in_array($type, $supportExamples, true) ? (string) $property : '';
     }
 
 

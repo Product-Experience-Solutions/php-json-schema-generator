@@ -5,6 +5,11 @@
 
 Originaly forked from [solvire/php-json-schema-generator](https://github.com/solvire/php-json-schema-generator)
 
+#### List of changes:
+
+ - Collect examples for each scalar type.
+ - Items properties merged to single list instead of 'anyOf' list.
+
 Introduction to json schema below (and tools) :
  
  - http://json-schema.org — reference
@@ -86,7 +91,7 @@ Advanced usage
     */
     
     
-    // if you want items as strict lists instead of "anyOf" type
+    // if you want items as strict lists instead of properties list
     $result = Generator::fromJson($this->addressJson1, [
         'schema_id'                      => 'http://bar.foo/schema2',
         'schema_title'                   => 'coucouc',

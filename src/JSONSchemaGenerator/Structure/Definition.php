@@ -15,7 +15,7 @@ class Definition implements \JsonSerializable
 {
 
 
-    const ITEMS_AS_COLLECTION = 0; // use anyOf instead of strict collection
+    const ITEMS_AS_COLLECTION = 0;
     const ITEMS_AS_LIST = 1;
 
     /**
@@ -29,6 +29,11 @@ class Definition implements \JsonSerializable
      * @var string $type
      */
     protected $type;
+
+    /**
+     * @var string $example
+     */
+    protected $example;
 
     /**
      *
@@ -128,6 +133,14 @@ class Definition implements \JsonSerializable
         return $this->type;
     }
 
+    /**
+     * @return string the $example
+     */
+    public function getExample()
+    {
+        return $this->example;
+    }
+
 
     /**
      * @return null|string the $title
@@ -203,6 +216,17 @@ class Definition implements \JsonSerializable
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @param $example
+     * @return $this
+     */
+    public function setExample(string $example)
+    {
+        $this->example = $example;
 
         return $this;
     }
@@ -367,7 +391,7 @@ class Definition implements \JsonSerializable
      */
     public function flatten()
     {
-        // field object - to force the object type in json encode 
+        // field object - to force the object type in json encode
         $fa = new \stdClass();
 
         if (!empty($this->getId())) {
@@ -375,6 +399,7 @@ class Definition implements \JsonSerializable
         }
 
         $fa->type = $this->getType();
+        $fa->examples = $this->getExample();
 
         if ($this->getTitle()) {
             $fa->title = $this->getTitle();
@@ -394,7 +419,7 @@ class Definition implements \JsonSerializable
                 $fa->max = $this->getMax();
             }
         }
-        
+
         if (  $fa->type === StringMapper::STRING_TYPE
            && $this->getFormat()
         ) {
@@ -419,10 +444,20 @@ class Definition implements \JsonSerializable
             if ($this->getCollectionMode() == self::ITEMS_AS_LIST) {
                 $fa->items = $items;
             } else {
-                // collection of various schema using 'anyOf'
-                $fa->items = new \StdClass();
-                // deduplicate items in anyOf type
-                $fa->items->anyOf = $items;
+                $fa->items = [];
+                $fa->items['type'] = StringMapper::OBJECT_TYPE;
+                $fa->items['properties'] = [];
+                foreach ($items as $item) {
+                    foreach ($item->properties as $key => $property) {
+                        if (isset($fa->items['properties'][$key])) {
+                            $property = (array) $property;
+                            $fa->items['properties'][$key] = $this->arrayMergeRecursiveDistinct($fa->items['properties'][$key], $property);
+                        }
+                        else {
+                            $fa->items['properties'][$key] = (array) $property;
+                        }
+                    }
+                }
             }
 
         } else if ($this->getType() === StringMapper::OBJECT_TYPE) {
@@ -517,6 +552,33 @@ class Definition implements \JsonSerializable
         }
         ksort($arr);
         return $arr;
+    }
+
+    /**
+     * Merges multidimensional arrays recursively.
+     *
+     * Merges array in the way array_merge does, by overwriting the value in the first array with the duplicate
+     * value in the second array, not by duplicating values like array_merge_recursive does.
+     *
+     * @param array $array1
+     * @param array $array2
+     *
+     * @return array
+     *
+     * */
+    private function arrayMergeRecursiveDistinct(array &$array1, array &$array2)
+    {
+        $merged = $array1;
+
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset ($merged [$key]) && is_array($merged [$key])) {
+                $merged [$key] = $this->arrayMergeRecursiveDistinct($merged [$key], $value);
+            } else {
+                $merged [$key] = $value;
+            }
+        }
+
+        return $merged;
     }
 
     /**
