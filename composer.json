@@ -1,5 +1,5 @@
 {
-    "name": "evaisse/php-json-schema-generator",
+    "name": "pxhub/php-json-schema-generator",
     "type": "library",
     "description": "A JSON Schema Generator.",
     "keywords": [
@@ -10,7 +10,7 @@
         "validation",
         "parser"
     ],
-    "homepage": "https://github.com/evaisse/php-json-schema-generator",
+    "homepage": "https://github.com/Product-Experience-Solutions/php-json-schema-generator",
     "license": "MIT",
     "authors": [
         {

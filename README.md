@@ -3,7 +3,7 @@
 ![Build Status](https://travis-ci.org/evaisse/php-json-schema-generator.svg?branch=master#)
 [![codecov](https://codecov.io/gh/evaisse/php-json-schema-generator/branch/master/graph/badge.svg)](https://codecov.io/gh/evaisse/php-json-schema-generator)
 
-Originaly forked from [solvire/php-json-schema-generator](https://github.com/solvire/php-json-schema-generator)
+Originaly forked from [evaisse/php-json-schema-generator](https://github.com/evaisse/php-json-schema-generator)
 
 #### List of changes:
 
