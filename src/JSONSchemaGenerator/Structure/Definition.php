@@ -448,7 +448,7 @@ class Definition implements \JsonSerializable
                 $fa->items['type'] = StringMapper::OBJECT_TYPE;
                 $fa->items['properties'] = [];
                 foreach ($items as $item) {
-                    foreach ($item->properties as $key => $property) {
+                    foreach (isset($item->properties) ? $item->properties : [] as $key => $property) {
                         if (isset($fa->items['properties'][$key])) {
                             $property = (array) $property;
                             $fa->items['properties'][$key] = $this->arrayMergeRecursiveDistinct($fa->items['properties'][$key], $property);
