@@ -421,7 +421,7 @@ class Definition implements \JsonSerializable
         }
 
         if (  $fa->type === StringMapper::STRING_TYPE
-           && $this->getFormat()
+            && $this->getFormat()
         ) {
             $fa->format = $this->getFormat();
         }
@@ -435,15 +435,19 @@ class Definition implements \JsonSerializable
 
         if ($this->getType() === StringMapper::ARRAY_TYPE) {
 
+            $itemTypes = [];
             // add the items
             $items = [];
             foreach ($this->getItems() as $key => $item) {
+                $itemTypes[$item->getType()] = $item;
                 $items[] = $item->flatten();
             }
 
             if ($this->getCollectionMode() == self::ITEMS_AS_LIST) {
                 $fa->items = $items;
-            } else {
+            } elseif (1 === count($itemTypes)  && key($itemTypes) !== StringMapper::OBJECT_TYPE) {
+                $fa->items = reset($itemTypes);
+            } elseif ($items) {
                 $fa->items = [];
                 $fa->items['type'] = StringMapper::OBJECT_TYPE;
                 $fa->items['properties'] = [];
