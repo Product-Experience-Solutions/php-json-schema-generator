@@ -453,12 +453,12 @@ class Definition implements \JsonSerializable
                 $fa->items['properties'] = [];
                 foreach ($items as $item) {
                     foreach (isset($item->properties) ? $item->properties : [] as $key => $property) {
+                        $property = (array) $property;
                         if (isset($fa->items['properties'][$key])) {
-                            $property = (array) $property;
                             $fa->items['properties'][$key] = $this->arrayMergeRecursiveDistinct($fa->items['properties'][$key], $property);
                         }
                         else {
-                            $fa->items['properties'][$key] = (array) $property;
+                            $fa->items['properties'][$key] = $property;
                         }
                     }
                 }
@@ -570,13 +570,13 @@ class Definition implements \JsonSerializable
      * @return array
      *
      * */
-    private function arrayMergeRecursiveDistinct(array &$array1, array &$array2)
+    private function arrayMergeRecursiveDistinct(array $array1, array $array2)
     {
         $merged = $array1;
 
-        foreach ($array2 as $key => &$value) {
-            if (is_array($value) && isset ($merged [$key]) && is_array($merged [$key])) {
-                $merged [$key] = $this->arrayMergeRecursiveDistinct($merged [$key], $value);
+        foreach ($array2 as $key => $value) {
+            if (!is_scalar($value) && isset ($merged [$key]) && !is_scalar($merged [$key])) {
+                $merged [$key] = $this->arrayMergeRecursiveDistinct((array) $merged [$key], (array) $value);
             } else {
                 $merged [$key] = $value;
             }
